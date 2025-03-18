@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from src.services.test_service import test_access
 
 router = APIRouter()
 
