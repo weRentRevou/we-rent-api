@@ -25,10 +25,10 @@ ENV PATH="/app/.venv/bin:$PATH"
 RUN echo "source /app/.venv/bin/activate" >>/etc/profile.d/venv.sh
 
 # Install Hypercorn
-RUN pip install hypercorn
+RUN pip install uvicorn
 
 # Expose port
 EXPOSE 5000
 
 # Run Hypercorn with app
-CMD ["hypercorn", "app:app", "--bind", "0.0.0.0:5000", "--reload"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000","--reload"]
