@@ -14,6 +14,7 @@ class DevConfig(BaseConfig):
     ALGORITHM: ClassVar[str] = "HS512"
     ACCESS_TOKEN_EXPIRE_MINUTES: ClassVar[int] = 30
     # SECRET_KEY: str = os.getenv("KEY_SECRET")
+    SECRET_KEY: str = Field(..., alias="KEY_SECRET")
 
     # Define allowed origins
     origins: ClassVar[List[str]] = [
