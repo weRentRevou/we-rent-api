@@ -2,11 +2,13 @@ from .base import BaseConfig
 from typing import ClassVar, List
 import os
 from dotenv import load_dotenv
+from pydantic import Field
 
 load_dotenv(override=True)
 
 class DevConfig(BaseConfig):
-    DATABASE_URL: str = os.getenv("DB_DEV_URI")
+    # DATABASE_URL: str = os.getenv("DB_DEV_URI")
+    DATABASE_URL: str = Field(..., alias="DB_URI_DEV")
     JWT_SECRET: str = os.getenv("JWT_SECRET")
     # Use ClassVar to indicate these are not Pydantic model fields
     ALGORITHM: ClassVar[str] = "HS512"
