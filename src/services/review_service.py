@@ -7,7 +7,6 @@ from sqlalchemy.orm import joinedload
 from app import db
 from src.models.product_review_models import ProductReview
 from src.models.user_models import User
-from src.models.review_reply import ReviewReply
 from src.validators.product_review_validator import ReviewCreate, ReviewUpdate
 
 async def get_product_reviews(

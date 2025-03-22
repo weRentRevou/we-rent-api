@@ -64,3 +64,8 @@ class ReviewUpdate(BaseModel):
         ):
             raise ValueError("Either review_text or review_photo must be provided")
         return self
+    
+class ReviewReplyVal(BaseModel):
+    user_id: int
+    comment_text: str
+    is_liked: Optional[bool] = False
