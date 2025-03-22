@@ -17,7 +17,8 @@ class ProductReview(Base):
 
     product = relationship('Product', back_populates="reviews")
     replies = relationship('ReviewReply', back_populates="review")
-
+    user = relationship('User')  
+    
     def to_dict(self):
         return {
             'id': self.id,
@@ -26,6 +27,6 @@ class ProductReview(Base):
             'review_text': self.review_text,
             'rating': self.rating,
             'review_photo': self.review_photo,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': self.created_at.isoformat() if self.created_at else None,  # Avoid NoneType error
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None  # Handle updated_at as well
         }
