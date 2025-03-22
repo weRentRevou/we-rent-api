@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Float
-# from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship
 from src.models.base import Base
 from datetime import datetime
 
@@ -14,7 +14,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), default=datetime.now)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)
 
-
+    review_replies = relationship('ReviewReply', back_populates='user', cascade='all, delete-orphan')
     # orders = db.relationship('Order', backref=db.backref('user', lazy=True))
 
     def to_dict(self):
