@@ -1,30 +1,55 @@
+from fastapi import Response
 from fastapi.responses import JSONResponse
 from typing import List, Optional
-from sqlalchemy import func
+from sqlalchemy import asc, desc, func, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from app import db
 from src.models.product_review_models import ProductReview
 from src.models.user_models import User
 from src.models.review_reply import ReviewReply
+from src.validators.product_review_validator import ReviewCreate, ReviewUpdate
 
-async def get_product_reviews(product_id: int) -> JSONResponse:
+async def get_product_reviews(
+                product_id: int,
+                rating: Optional[int] = None,
+                has_photo: Optional[bool] = None,
+                sort_by: Optional[str] = "newest",
+                response: Optional[Response] = None
+
+            ) -> JSONResponse:
     """Fetch all reviews for a given product, including aggregated rating and fit scale."""
     try:
-        reviews = (
+        query = (
             db.session.query(ProductReview)
             .filter(ProductReview.product_id == product_id)
             .options(joinedload(ProductReview.replies), joinedload(ProductReview.user))
-            .all()
         )
+        
+        total_reviews = query.count()
+        
+        if rating is not None:
+            query = query.filter(ProductReview.rating == rating)
+
+        if has_photo is not None:
+            if has_photo:
+                query = query.filter(ProductReview.review_photo.isnot(None))
+            else:
+                query = query.filter(ProductReview.review_photo.is_(None))
+
+        if sort_by == "newest":
+            query = query.order_by(desc(ProductReview.created_at))
+        elif sort_by == "oldest":
+            query = query.order_by(asc(ProductReview.created_at))
+            
+
+        reviews = query.all()
 
         if not reviews:
             return JSONResponse(content={"error": "No reviews found for this product"}, status_code=404)
 
-        
-        #might change it later to find avg rating of all reviews
         avg_rating_query = db.session.execute(
-            "SELECT AVG(rating) FROM product_reviews WHERE product_id = :product_id",
+            text("SELECT AVG(rating) FROM product_reviews WHERE product_id = :product_id"),
             {"product_id": product_id}
         )
 
@@ -71,8 +96,72 @@ async def get_product_reviews(product_id: int) -> JSONResponse:
             "reviews": review_list
         }
 
+        if response is not None:
+            response.headers["X-Total-Review"] = str(total_reviews)
+            response.headers["X-Filtered-Review"] = str(len(reviews))
+            
         return JSONResponse(content=response_data, status_code=200)
 
     except (IntegrityError, SQLAlchemyError) as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+    
+    
+    
+async def create_product_review(review_data: ReviewCreate) -> JSONResponse:
+    try:
+        new_review = ProductReview(
+            user_id=review_data.user_id,
+            product_id=review_data.product_id,
+            rating=review_data.rating,
+            review_text=review_data.review_text,
+            review_photo=review_data.review_photo
+        )
+
+        db.session.add(new_review)
+        db.session.commit()
+        db.session.refresh(new_review)
+
+        return JSONResponse(
+            content={
+                "message": "Review created successfully",
+                "data": new_review.to_dict()
+            },
+            status_code=201
+        )
+
+    except (IntegrityError, SQLAlchemyError) as e:
+        db.session.rollback()
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+    
+async def update_product_review(review_id: int, review_data: ReviewUpdate):
+    try:
+        review = db.session.query(ProductReview).filter_by(id=review_id).first()
+
+        if not review:
+            return JSONResponse(content={"error": "Review not found"}, status_code=404)
+
+        if review_data.rating is not None:
+            review.rating = review_data.rating
+        if review_data.review_text is not None:
+            review.review_text = review_data.review_text
+        if review_data.review_photo is not None:
+            review.review_photo = review_data.review_photo
+
+        db.session.commit()
+        db.session.refresh(review)
+
+        return JSONResponse(
+            content={
+                "message": "Review updated successfully",
+                "data": review.to_dict()
+            },
+            status_code=200
+        )
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+    
+    
+
 
