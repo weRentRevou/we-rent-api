@@ -21,8 +21,8 @@ class User(Base):
         return {
             'id': self.id,
             'name': self.name,
-            'height': self.height,
-            'weight': self.weight,
+            'height': float(self.height) if self.height is not None else None,
+            'weight': float(self.weight) if self.weight is not None else None,
             'profile_image': self.profile_image,
-            'created_at': self.created_at
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }

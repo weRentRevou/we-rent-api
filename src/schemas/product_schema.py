@@ -26,3 +26,6 @@ class UpdateProductSchema(BaseModel):
     fabric: Optional[str] = None
     fit: Optional[str] = None
     product_image: Optional[str] = None
+
+    class Config:
+        from_attributes = True
