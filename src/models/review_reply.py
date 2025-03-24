@@ -9,7 +9,7 @@ class ReviewReply(Base):
     id = Column(Integer, primary_key=True)
     review_id = Column(Integer, ForeignKey('product_reviews.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    comment_text = Column(Text, nullable=False)
+    comment_text = Column(Text, nullable=True)
     is_liked = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), default=datetime.now)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)

@@ -38,6 +38,7 @@ async def create_user(user_param: UserSchema):
             return JSONResponse(content={"error": "User already exists"}, status_code=400)
         user = User(
             # id=user_param.user_id,
+            body_size=user_param.body_size if user_param.body_size else None,
             name=user_param.name,
             height=user_param.height,
             weight=user_param.weight,
