@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float, Numeric, Text, ForeignKey
+from sqlalchemy import ARRAY, Column, Integer, String, DateTime, Float, Numeric, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from src.models.base import Base
 from datetime import datetime
@@ -11,7 +11,7 @@ class ProductReview(Base):
     product_id = Column(Integer, ForeignKey('products.id'), nullable=False)
     review_text = Column(Text, nullable=True)
     rating = Column(Float, nullable=False)
-    review_photo = Column(String(255), nullable=True)  # Store multiple review images
+    review_photo = Column(ARRAY(String), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)
 

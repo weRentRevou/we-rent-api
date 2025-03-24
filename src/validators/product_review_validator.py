@@ -1,12 +1,13 @@
-from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import Optional
+from pydantic import BaseModel, Field, HttpUrl, field_validator, model_validator
+from typing import List, Optional
 
 class ReviewCreate(BaseModel):
     user_id: int
     product_id: int
     rating: float = Field(..., ge=1, le=5)
     review_text: Optional[str] = Field(None, max_length=1000)
-    review_photo: Optional[str] = None 
+    review_photo: Optional[List[HttpUrl]] = None  # Accept list of URLs
+
 
     @field_validator("rating")
     @classmethod
