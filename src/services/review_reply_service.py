@@ -20,10 +20,10 @@ async def create_reply_review(review_id: int, reply_data: ReviewReplyVal):
         db.session.refresh(new_reply)
         
         return JSONResponse(
-            content=json.dumps({
+            content={
                 "message": "Review reply created successfully",
                 "data": new_reply.to_dict()
-            }),
+            },
             status_code=201
         )
     except SQLAlchemyError as e:
@@ -38,10 +38,10 @@ async def get_replies_review(review_id: int):
             return {"error": "Reply not found"}
         
         return JSONResponse(
-            content=json.dumps({
+            content={
                 "message": "Get review replies {review_id} id successfully",
                 "data": [reply.to_dict() for reply in replies]
-            }),
+            },
             status_code=200
         )
     except (IntegrityError, SQLAlchemyError) as e:
