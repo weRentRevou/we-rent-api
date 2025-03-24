@@ -33,6 +33,7 @@ async def get_product_by_id(product_id: int):
 async def create_product(product_param: ProductSchema):
     try:
         product = Product(
+            user_id=product_param.user_id if product_param.user_id else None,
             name=product_param.name,
             description=product_param.description,
             price=product_param.price,

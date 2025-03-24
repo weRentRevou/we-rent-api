@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float, Numeric, Text
+from sqlalchemy import Column, Integer, String, DateTime, Float, Numeric, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from src.models.base import Base
 from datetime import datetime
@@ -7,6 +7,7 @@ class Product(Base):
     __tablename__ = 'products'
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     price = Column(Numeric(16, 2), nullable=False)
@@ -21,11 +22,13 @@ class Product(Base):
 
     reviews = relationship('ProductReview', back_populates="product")
     # orders = relationship('Order', backref=db.backref('product', lazy=True))
+    users = relationship('User', back_populates="products")
 
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
+            'user_id': self.user_id if self.user_id is not None else None,
             'description': self.description,
             'price': float(self.price) if self.price is not None else None,  # Convert Decimal to float safely
             'size': self.size,
