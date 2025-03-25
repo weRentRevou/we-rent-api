@@ -20,13 +20,18 @@ class ProductReview(Base):
     user = relationship('User')  
     
     def to_dict(self):
+        converted_photo = self.review_photo
+        if isinstance(converted_photo, list) and all(isinstance(c, str) and len(c) == 1 for c in converted_photo):
+            joined_str = "".join(converted_photo).strip("{}")
+            converted_photo = [url.strip() for url in joined_str.split(",") if url.strip()]
+
         return {
             'id': self.id,
             'user_id': self.user_id,
             'product_id': self.product_id,
             'review_text': self.review_text,
             'rating': self.rating,
-            'review_photo': self.review_photo,
-            'created_at': self.created_at.isoformat() if self.created_at else None,  # Avoid NoneType error
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None  # Handle updated_at as well
+            'review_photo': converted_photo or [],
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

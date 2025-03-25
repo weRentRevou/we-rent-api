@@ -6,7 +6,7 @@ class ReviewCreate(BaseModel):
     product_id: int
     rating: float = Field(..., ge=1, le=5)
     review_text: Optional[str] = Field(None, max_length=1000)
-    review_photo: Optional[List[HttpUrl]] = None  # Accept list of URLs
+    review_photo: Optional[List[HttpUrl]] = None  
 
 
     @field_validator("rating")
@@ -18,10 +18,13 @@ class ReviewCreate(BaseModel):
 
     @field_validator("review_photo")
     @classmethod
-    def validate_photo_url(cls, photo_url):
-        if photo_url and not photo_url.lower().startswith(("http://", "https://")):
-            raise ValueError("review_photo must be a valid URL")
-        return photo_url
+    def validate_photo_url(cls, photo_urls):
+        if photo_urls: 
+            for photo_url in photo_urls:
+                if not str(photo_url).lower().startswith(("http://", "https://")):
+                    raise ValueError("Each URL in review_photo must be a valid URL")
+        return photo_urls
+
     
     
     @field_validator("review_text")
@@ -47,7 +50,8 @@ class ReviewCreate(BaseModel):
 class ReviewUpdate(BaseModel):
     rating: Optional[float] = Field(None, ge=1, le=5)
     review_text: Optional[str] = Field(None, max_length=1000)
-    review_photo: Optional[str] = None
+    review_photo: Optional[List[HttpUrl]] = None  
+
 
     @field_validator("rating")
     @classmethod
@@ -55,6 +59,16 @@ class ReviewUpdate(BaseModel):
         if rating is not None and rating * 2 != int(rating * 2):
             raise ValueError("Rating must be in 0.5 increments (e.g., 4.0, 3.5)")
         return rating
+    
+    
+    @field_validator("review_photo")
+    @classmethod
+    def validate_photo_url(cls, photo_urls):
+        if photo_urls: 
+            for photo_url in photo_urls:
+                if not str(photo_url).lower().startswith(("http://", "https://")):
+                    raise ValueError("Each URL in review_photo must be a valid URL")
+        return photo_urls
 
     @model_validator(mode="after")
     def validate_text_or_photo(self):

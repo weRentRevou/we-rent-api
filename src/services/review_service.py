@@ -108,29 +108,32 @@ async def get_product_reviews(
     
 async def create_product_review(review_data: ReviewCreate) -> JSONResponse:
     try:
+        
+        review_photo_strs = [str(photo) for photo in review_data.review_photo] if review_data.review_photo else []
+        print("Converted review_photo:", review_photo_strs)
         new_review = ProductReview(
             user_id=review_data.user_id,
             product_id=review_data.product_id,
             rating=review_data.rating,
             review_text=review_data.review_text,
-            review_photo=review_data.review_photo
+            review_photo=review_photo_strs  # Now it's a list of pure strings
         )
 
         db.session.add(new_review)
         db.session.commit()
         db.session.refresh(new_review)
 
-        return JSONResponse(
-            content={
-                "message": "Review created successfully",
-                "data": new_review.to_dict()
-            },
-            status_code=201
-        )
+    
+        print(new_review.review_photo)
+        response_data = new_review.to_dict()
+        print(response_data)
+        return JSONResponse(status_code=201, content={"message": "Review created successfully", "data": response_data})
 
-    except (IntegrityError, SQLAlchemyError) as e:
+    except Exception as e:
         db.session.rollback()
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        return JSONResponse(status_code=400, content={"message": f"An error occurred: {str(e)}"})
+
+
     
 async def update_product_review(review_id: int, review_data: ReviewUpdate):
     try:
@@ -138,14 +141,18 @@ async def update_product_review(review_id: int, review_data: ReviewUpdate):
 
         if not review:
             return JSONResponse(content={"error": "Review not found"}, status_code=404)
-
+        
+        review_photo_strs = [str(photo) for photo in review_data.review_photo] if review_data.review_photo else []
+        print("Converted review_photo:", review_photo_strs)
+        
+        
         if review_data.rating is not None:
             review.rating = review_data.rating
         if review_data.review_text is not None:
             review.review_text = review_data.review_text
         if review_data.review_photo is not None:
-            review.review_photo = review_data.review_photo
-
+            review.review_photo = review_photo_strs
+            
         db.session.commit()
         db.session.refresh(review)
 
