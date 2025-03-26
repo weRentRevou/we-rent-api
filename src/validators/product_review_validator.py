@@ -83,3 +83,4 @@ class ReviewUpdate(BaseModel):
 class ReviewReplyVal(BaseModel):
     user_id: int
     comment_text: str
+    is_liked: bool
