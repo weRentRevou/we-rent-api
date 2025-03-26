@@ -11,7 +11,7 @@ class ProductReview(Base):
     product_id = Column(Integer, ForeignKey('products.id'), nullable=False)
     review_text = Column(Text, nullable=True)
     rating = Column(Float, nullable=False)
-    review_photo = Column(ARRAY(String), nullable=True)
+    review_photo =  Column(ARRAY(String(2048)), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)
 
