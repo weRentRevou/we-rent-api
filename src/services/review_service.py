@@ -83,6 +83,8 @@ async def get_product_reviews(
                 "name": user.name,
                 "height": user.height,
                 "weight": user.weight,
+                "body_size": user.body_size,
+                "designer_photo": user.designer_photo,
                 "profile_image": user.profile_image or "link_to_default_image"
             }
             review_data["user"] = user_details
