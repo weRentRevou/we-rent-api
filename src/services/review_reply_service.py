@@ -8,24 +8,42 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 async def create_reply_review(review_id: int, reply_data: ReviewReplyVal):
     try:
-        new_reply = ReviewReply(
-            review_id=review_id,
-            user_id=reply_data.user_id,
-            comment_text=reply_data.comment_text,
-            is_liked=reply_data.is_liked
-        )
+        user_exist = (db.session.query(ReviewReply).filter(ReviewReply.user_id == reply_data.user_id, ReviewReply.review_id == review_id).first())
         
-        db.session.add(new_reply)
+        if user_exist is None:
+            print("masuk")
+            new_reply = ReviewReply(
+                review_id=review_id,
+                user_id=reply_data.user_id,    
+                comment_text=reply_data.comment_text,
+                is_liked=reply_data.is_liked
+            )
+        
+            db.session.add(new_reply)
+            db.session.commit()
+            db.session.refresh(new_reply)
+        
+            return JSONResponse(
+                content={
+                    "message": "Review reply created successfully",
+                    "data": new_reply.to_dict()
+                },
+                status_code=201
+            )
+        
+        user_exist.is_liked = not reply_data.is_liked
+        
         db.session.commit()
-        db.session.refresh(new_reply)
-        
+        db.session.refresh(user_exist)
+            
         return JSONResponse(
             content={
-                "message": "Review reply created successfully",
-                "data": new_reply.to_dict()
+                "message": "Review reply updated successfully",
+                "data": user_exist.to_dict()
             },
             status_code=201
         )
+                        
     except SQLAlchemyError as e:
         db.session.rollback()
         return JSONResponse(content={"error": str(e)}, status_code=500)
