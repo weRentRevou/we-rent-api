@@ -10,9 +10,6 @@ async def create_reply_review(review_id: int, reply_data: ReviewReplyVal):
     try:
         user_exist = (db.session.query(ReviewReply).filter(ReviewReply.user_id == reply_data.user_id, ReviewReply.review_id == review_id).first())
         
-        print(reply_data.is_liked)
-        print(user_exist.is_liked)
-        
         if user_exist is None:
             print("masuk")
             new_reply = ReviewReply(
