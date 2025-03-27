@@ -11,7 +11,6 @@ class User(Base):
     height = Column(Float, nullable=True)
     weight = Column(Float, nullable=True)
     profile_image = Column(String(255), nullable=True)
-    designer_photo = Column(String(255), nullable=True)
     body_size = Column(String(255), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)

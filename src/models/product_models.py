@@ -17,6 +17,7 @@ class Product(Base):
     fabric = Column(String(100), nullable=True)
     fit = Column(String(100), nullable=True)
     product_image = Column(String(255), nullable=True)
+    designer_photo = Column(String(255), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now)
     updated_at = Column(DateTime(timezone=True), onupdate=datetime.now)
 
