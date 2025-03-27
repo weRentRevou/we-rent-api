@@ -43,6 +43,7 @@ async def create_product(product_param: ProductSchema):
             fabric=product_param.fabric,
             fit=product_param.fit,
             product_image=product_param.product_image,
+            designer_photo=product_param.designer_photo
         )
         db.session.add(product)
         db.session.commit()
