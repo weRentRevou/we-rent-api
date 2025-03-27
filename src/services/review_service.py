@@ -1,3 +1,4 @@
+import math
 from fastapi import Response
 from fastapi.responses import JSONResponse
 from typing import List, Optional
@@ -111,23 +112,21 @@ async def create_product_review(review_data: ReviewCreate) -> JSONResponse:
     try:
         
         review_photo_strs = [str(photo) for photo in review_data.review_photo] if review_data.review_photo else []
-        print("Converted review_photo:", review_photo_strs)
         new_review = ProductReview(
             user_id=review_data.user_id,
             product_id=review_data.product_id,
-            rating=review_data.rating,
+            rating=math.floor(review_data.rating),
             review_text=review_data.review_text,
-            review_photo=review_photo_strs  # Now it's a list of pure strings
+            review_photo=review_photo_strs  
         )
 
         db.session.add(new_review)
         db.session.commit()
         db.session.refresh(new_review)
 
-    
-        print(new_review.review_photo)
+
         response_data = new_review.to_dict()
-        print(response_data)
+        
         return JSONResponse(status_code=201, content={"message": "Review created successfully", "data": response_data})
 
     except Exception as e:
