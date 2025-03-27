@@ -27,6 +27,5 @@ class User(Base):
             'weight': float(self.weight) if self.weight is not None else None,
             'body_size': self.body_size if self.body_size is not None else None,
             'profile_image': self.profile_image,
-            'designer_photo': self.designer_photo,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
