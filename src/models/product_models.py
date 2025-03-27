@@ -38,6 +38,7 @@ class Product(Base):
             'fabric': self.fabric,
             'fit': self.fit,
             'product_image': self.product_image,
+            'designer_photo': self.designer_photo,
             'created_at': self.created_at.isoformat() if self.created_at else None,  # Avoid NoneType error
             'updated_at': self.updated_at.isoformat() if self.updated_at else None  # Handle updated_at as well
         }
