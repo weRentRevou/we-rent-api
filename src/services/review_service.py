@@ -3,6 +3,7 @@ from fastapi import Response
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 from sqlalchemy import asc, desc, func, text
+
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from app import db
@@ -31,11 +32,13 @@ async def get_product_reviews(
         if rating is not None:
             query = query.filter(ProductReview.rating == rating)
 
-        if has_photo is not None:
-            if has_photo:
-                query = query.filter(ProductReview.review_photo.isnot(None))
-            else:
-                query = query.filter(ProductReview.review_photo.is_(None))
+        if has_photo:
+            query = query.filter(func.cardinality(ProductReview.review_photo) > 0)
+        else:
+            query = query.filter(
+                (ProductReview.review_photo.is_(None)) |
+                (func.cardinality(ProductReview.review_photo) == 0)
+            )
 
         if sort_by == "newest":
             query = query.order_by(desc(ProductReview.created_at))
